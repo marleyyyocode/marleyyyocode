@@ -14,3 +14,24 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
 -->
+*Economecis and Data Science Student**
+
+- 🔭 **Currently working on:** Economic impact of ESG index on stock market in Peru 
+- 🌱 **Currently learning:** Advanced Python (TensorFlow, PyTorch) and big data technologies
+- 👯 **Looking to collaborate on:** Economic development projects and open-source data science tools
+- 🤔 **Looking for help with:** Transitioning from academic research to industry data science roles
+
+### 🛠 Tech Stack
+**Econometrics:** VAR, PSM, Time Series  
+**Data Science:** Python, Stata  
+
+### 📈 Featured Projects
+- Copper price impact analysis (VAR modeling)
+- Health insurance access evaluation (PSM)
+- Mortgage approval prediction (Machine Learning)
+- Nutrition program impact (Policy evaluation)
+
+### 📫 Connect
+[LinkedIn](your-url) • [Email](mailto:your-email)
+
+> *Transforming economic data into actionable insights*
