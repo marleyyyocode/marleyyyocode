@@ -14,7 +14,7 @@ Here are some ideas to get you started:
 - 😄 Pronouns: ...
 - ⚡ Fun fact: ...
 -->
-*Economecis and Data Science Student**
+*Economics and Data Science Student**
 
 - 🔭 **Currently working on:** Economic impact of ESG index on stock market in Peru 
 - 🌱 **Currently learning:** Advanced Python (TensorFlow, PyTorch) and big data technologies
