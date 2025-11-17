@@ -1,8 +1,6 @@
-models/
-scalers/
-outputs/
 *.pyc
 __pycache__/
 .ipynb_checkpoints/
-*.pkl
 .DS_Store
+*.h5
+*.pkl

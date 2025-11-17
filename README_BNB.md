@@ -251,10 +251,16 @@ pip install tensorflow-cpu==2.13.0
 
 ### Error de descarga de datos
 
-Si yfinance no puede descargar datos:
-- Verifica tu conexión a internet
-- Comprueba que el símbolo 'BNB-USD' esté disponible
-- Intenta con un rango de fechas diferente
+Si yfinance no puede descargar datos debido a problemas de impersonación:
+- **Solución automática**: El script incluye un fallback que genera datos sintéticos para demostración
+- Los datos sintéticos siguen una distribución realista basada en BNB
+- Para datos reales, verifica:
+  - Tu conexión a internet
+  - El símbolo 'BNB-USD' está disponible en Yahoo Finance
+  - Intenta con un rango de fechas diferente
+  - Actualiza yfinance: `pip install --upgrade yfinance`
+
+**Nota**: Los datos sintéticos son **solo para propósitos de demostración del pipeline**. Para análisis real, asegúrate de usar datos reales de mercado.
 
 ### Error de memoria
 
