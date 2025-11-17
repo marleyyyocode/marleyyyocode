@@ -75,15 +75,30 @@ El script ejecutará automáticamente:
 
 ### Alternativa: Google Colab
 
-Para ejecutar en Google Colab sin instalación local:
+Para ejecutar en Google Colab sin instalación local y con mejor acceso a datos reales:
 
 ```python
 # En una celda de Colab
 !git clone https://github.com/marleyyyocode/marleyyyocode.git
 %cd marleyyyocode
 !pip install -r requirements.txt
+
+# Ejecutar el pipeline
 !python Codigo_GrupoBNB.py
+
+# Ver los resultados
+from IPython.display import Image, display
+import pandas as pd
+
+# Mostrar métricas
+print(pd.read_csv('metrics.csv'))
+
+# Mostrar gráficas
+display(Image('outputs/comparison_all_models.png'))
+display(Image('outputs/time_series_plots.png'))
 ```
+
+**Ventaja de Google Colab**: Generalmente tiene mejor acceso a APIs externas y puede descargar datos reales de Yahoo Finance sin problemas de impersonación.
 
 ## 📁 Estructura de Archivos
 
