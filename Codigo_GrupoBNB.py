@@ -164,38 +164,37 @@ def exploratory_data_analysis(df):
     """
     Realiza análisis exploratorio de datos.
     Calcula estadísticas descriptivas y genera visualizaciones.
+    Ahora incluye Daily_Return y Volatility en el análisis.
     
     Args:
-        df (pd.DataFrame): DataFrame con datos
+        df (pd.DataFrame): DataFrame con datos (debe incluir Daily_Return y Volatility)
     """
     print("\n" + "="*80)
     print("ANÁLISIS EXPLORATORIO DE DATOS")
     print("="*80)
     
-    # Estadísticas descriptivas
-    print("\nEstadísticas descriptivas para Close:")
-    print(df['Close'].describe())
+    # Estadísticas descriptivas para todas las variables
+    features_to_analyze = ['Close', 'High', 'Volume', 'Daily_Return', 'Volatility']
     
-    close_mean = df['Close'].mean()
-    close_median = df['Close'].median()
-    close_std = df['Close'].std()
-    close_min = df['Close'].min()
-    close_max = df['Close'].max()
+    for feature in features_to_analyze:
+        if feature in df.columns:
+            print(f"\nEstadísticas descriptivas para {feature}:")
+            print(df[feature].describe())
+            
+            feature_mean = df[feature].mean()
+            feature_median = df[feature].median()
+            feature_std = df[feature].std()
+            feature_min = df[feature].min()
+            feature_max = df[feature].max()
+            
+            print(f"Media: {feature_mean:.6f}")
+            print(f"Mediana: {feature_median:.6f}")
+            print(f"Desviación estándar: {feature_std:.6f}")
+            print(f"Mínimo: {feature_min:.6f}")
+            print(f"Máximo: {feature_max:.6f}")
     
-    print(f"\nMedia: {close_mean:.2f}")
-    print(f"Mediana: {close_median:.2f}")
-    print(f"Desviación estándar: {close_std:.2f}")
-    print(f"Mínimo: {close_min:.2f}")
-    print(f"Máximo: {close_max:.2f}")
-    
-    print("\nEstadísticas descriptivas para High:")
-    print(df['High'].describe())
-    
-    print("\nEstadísticas descriptivas para Volume:")
-    print(df['Volume'].describe())
-    
-    # Gráficas de series temporales
-    fig, axes = plt.subplots(3, 1, figsize=(14, 10))
+    # Gráficas de series temporales (ahora incluye 5 variables)
+    fig, axes = plt.subplots(5, 1, figsize=(14, 16))
     
     axes[0].plot(df['Date'], df['Close'], color='blue', linewidth=1.5)
     axes[0].set_title('Serie Temporal - Precio de Cierre (Close)', fontsize=14, fontweight='bold')
@@ -215,20 +214,35 @@ def exploratory_data_analysis(df):
     axes[2].set_ylabel('Volumen')
     axes[2].grid(True, alpha=0.3)
     
+    axes[3].plot(df['Date'], df['Daily_Return'], color='purple', linewidth=1.5)
+    axes[3].set_title('Serie Temporal - Retorno Diario (Daily_Return)', fontsize=14, fontweight='bold')
+    axes[3].set_xlabel('Fecha')
+    axes[3].set_ylabel('Retorno Diario')
+    axes[3].grid(True, alpha=0.3)
+    axes[3].axhline(y=0, color='black', linestyle='--', alpha=0.5)
+    
+    axes[4].plot(df['Date'], df['Volatility'], color='red', linewidth=1.5)
+    axes[4].set_title('Serie Temporal - Volatilidad (Volatility)', fontsize=14, fontweight='bold')
+    axes[4].set_xlabel('Fecha')
+    axes[4].set_ylabel('Volatilidad')
+    axes[4].grid(True, alpha=0.3)
+    
     plt.tight_layout()
     plt.savefig('outputs/time_series_plots.png', dpi=300, bbox_inches='tight')
     print("\nGráfica guardada: outputs/time_series_plots.png")
     plt.close()
     
-    # Mapa de correlación
-    corr_matrix = df[['Close', 'High', 'Volume']].corr()
+    # Mapa de correlación (ahora incluye todas las variables)
+    corr_cols = ['Close', 'High', 'Volume', 'Daily_Return', 'Volatility']
+    corr_matrix = df[corr_cols].corr()
     print("\nMatriz de correlación:")
     print(corr_matrix)
     
-    plt.figure(figsize=(8, 6))
-    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, 
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(corr_matrix, annot=True, fmt='.3f', cmap='coolwarm', center=0, 
                 square=True, linewidths=1, cbar_kws={"shrink": 0.8})
-    plt.title('Mapa de Correlación: Close, High, Volume', fontsize=14, fontweight='bold')
+    plt.title('Mapa de Correlación: Close, High, Volume, Daily_Return, Volatility', 
+              fontsize=14, fontweight='bold')
     plt.tight_layout()
     plt.savefig('outputs/correlation_heatmap.png', dpi=300, bbox_inches='tight')
     print("Gráfica guardada: outputs/correlation_heatmap.png")
@@ -257,26 +271,6 @@ def feature_engineering(df):
     
     print(f"Features creados: Daily_Return, Volatility")
     print(f"Registros después de eliminar NaNs: {len(df)}")
-    
-    # Visualizar Close y Volatility
-    fig, axes = plt.subplots(2, 1, figsize=(14, 8))
-    
-    axes[0].plot(df['Date'], df['Close'], color='blue', linewidth=1.5)
-    axes[0].set_title('Precio de Cierre (Close)', fontsize=14, fontweight='bold')
-    axes[0].set_xlabel('Fecha')
-    axes[0].set_ylabel('Precio (USD)')
-    axes[0].grid(True, alpha=0.3)
-    
-    axes[1].plot(df['Date'], df['Volatility'], color='red', linewidth=1.5)
-    axes[1].set_title('Volatilidad (Daily Volatility)', fontsize=14, fontweight='bold')
-    axes[1].set_xlabel('Fecha')
-    axes[1].set_ylabel('Volatilidad')
-    axes[1].grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    plt.savefig('outputs/close_volatility_plot.png', dpi=300, bbox_inches='tight')
-    print("Gráfica guardada: outputs/close_volatility_plot.png")
-    plt.close()
     
     return df
 
@@ -308,6 +302,159 @@ def temporal_split(df):
     print(f"Test: {len(test_df)} registros (2024-03-01 a 2024-11-15)")
     
     return train_df, val_df, test_df
+
+
+def expanding_cross_validation_split(df, n_splits=5):
+    """
+    Implementa Validación Cruzada Expansiva (Expanding Cross-Validation).
+    En cada split, el conjunto de entrenamiento crece progresivamente.
+    
+    Args:
+        df (pd.DataFrame): DataFrame con todos los datos ordenados temporalmente
+        n_splits (int): Número de splits para la validación cruzada
+    
+    Returns:
+        list: Lista de tuplas (train_df, val_df) para cada split
+    """
+    print("\n" + "="*80)
+    print("VALIDACIÓN CRUZADA EXPANSIVA (EXPANDING CROSS-VALIDATION)")
+    print("="*80)
+    
+    splits = []
+    total_size = len(df)
+    # Tamaño mínimo de train: 40% de los datos
+    min_train_size = int(total_size * 0.4)
+    # Tamaño de validación: aproximadamente 10% de los datos
+    val_size = int(total_size * 0.1)
+    
+    for i in range(n_splits):
+        # El tamaño de train crece en cada split
+        train_end_idx = min_train_size + int((i + 1) * (total_size - min_train_size - val_size) / n_splits)
+        val_end_idx = min(train_end_idx + val_size, total_size)
+        
+        train_df = df.iloc[:train_end_idx].copy()
+        val_df = df.iloc[train_end_idx:val_end_idx].copy()
+        
+        splits.append((train_df, val_df))
+        print(f"Split {i+1}: Train={len(train_df)} ({df.iloc[0]['Date']} a {df.iloc[train_end_idx-1]['Date']}), "
+              f"Val={len(val_df)} ({df.iloc[train_end_idx]['Date']} a {df.iloc[val_end_idx-1]['Date']})")
+    
+    return splits
+
+
+def sliding_cross_validation_split(df, n_splits=5, train_size_ratio=0.6):
+    """
+    Implementa Validación Cruzada Deslizante (Sliding Cross-Validation).
+    El conjunto de entrenamiento tiene tamaño fijo y se desliza a través del tiempo.
+    
+    Args:
+        df (pd.DataFrame): DataFrame con todos los datos ordenados temporalmente
+        n_splits (int): Número de splits para la validación cruzada
+        train_size_ratio (float): Proporción de datos para entrenamiento en cada split
+    
+    Returns:
+        list: Lista de tuplas (train_df, val_df) para cada split
+    """
+    print("\n" + "="*80)
+    print("VALIDACIÓN CRUZADA DESLIZANTE (SLIDING CROSS-VALIDATION)")
+    print("="*80)
+    
+    splits = []
+    total_size = len(df)
+    train_size = int(total_size * train_size_ratio)
+    val_size = int(total_size * 0.1)
+    
+    # Calcular el paso para deslizar la ventana
+    max_start = total_size - train_size - val_size
+    step = max(1, max_start // (n_splits - 1)) if n_splits > 1 else 0
+    
+    for i in range(n_splits):
+        start_idx = min(i * step, max_start)
+        train_end_idx = start_idx + train_size
+        val_end_idx = min(train_end_idx + val_size, total_size)
+        
+        train_df = df.iloc[start_idx:train_end_idx].copy()
+        val_df = df.iloc[train_end_idx:val_end_idx].copy()
+        
+        splits.append((train_df, val_df))
+        print(f"Split {i+1}: Train={len(train_df)} ({df.iloc[start_idx]['Date']} a {df.iloc[train_end_idx-1]['Date']}), "
+              f"Val={len(val_df)} ({df.iloc[train_end_idx]['Date']} a {df.iloc[val_end_idx-1]['Date']})")
+    
+    return splits
+
+
+def compare_cv_strategies(df):
+    """
+    Compara las tres estrategias de división temporal:
+    1. División fija original
+    2. Expanding Cross-Validation
+    3. Sliding Cross-Validation
+    
+    Args:
+        df (pd.DataFrame): DataFrame con todos los datos
+    """
+    print("\n" + "="*80)
+    print("COMPARACIÓN DE ESTRATEGIAS DE VALIDACIÓN CRUZADA")
+    print("="*80)
+    
+    # Estrategia 1: División fija original
+    print("\n1. DIVISIÓN FIJA ORIGINAL:")
+    train_df = df[(df['Date'] >= '2022-01-13') & (df['Date'] <= '2023-11-30')].copy()
+    val_df = df[(df['Date'] >= '2023-12-01') & (df['Date'] <= '2024-02-28')].copy()
+    test_df = df[(df['Date'] >= '2024-03-01') & (df['Date'] <= '2024-11-15')].copy()
+    print(f"   Train: {len(train_df)} registros")
+    print(f"   Val: {len(val_df)} registros")
+    print(f"   Test: {len(test_df)} registros")
+    
+    # Estrategia 2: Expanding CV
+    print("\n2. EXPANDING CROSS-VALIDATION:")
+    expanding_splits = expanding_cross_validation_split(df, n_splits=5)
+    
+    # Estrategia 3: Sliding CV
+    print("\n3. SLIDING CROSS-VALIDATION:")
+    sliding_splits = sliding_cross_validation_split(df, n_splits=5)
+    
+    # Visualización comparativa
+    fig, axes = plt.subplots(3, 1, figsize=(14, 10))
+    
+    # Plot 1: División fija
+    axes[0].barh(['Split 1'], [len(train_df)], left=[0], color='blue', alpha=0.6, label='Train')
+    axes[0].barh(['Split 1'], [len(val_df)], left=[len(train_df)], color='orange', alpha=0.6, label='Val')
+    axes[0].barh(['Split 1'], [len(test_df)], left=[len(train_df) + len(val_df)], color='green', alpha=0.6, label='Test')
+    axes[0].set_title('Estrategia 1: División Fija Original', fontsize=12, fontweight='bold')
+    axes[0].set_xlabel('Número de registros')
+    axes[0].legend(loc='upper right')
+    axes[0].grid(True, alpha=0.3, axis='x')
+    
+    # Plot 2: Expanding CV
+    for i, (train, val) in enumerate(expanding_splits):
+        axes[1].barh([f'Split {i+1}'], [len(train)], left=[0], color='blue', alpha=0.6)
+        axes[1].barh([f'Split {i+1}'], [len(val)], left=[len(train)], color='orange', alpha=0.6)
+    axes[1].set_title('Estrategia 2: Expanding Cross-Validation', fontsize=12, fontweight='bold')
+    axes[1].set_xlabel('Número de registros')
+    axes[1].grid(True, alpha=0.3, axis='x')
+    
+    # Plot 3: Sliding CV
+    for i, (train, val) in enumerate(sliding_splits):
+        start_pos = i * 50  # Offset visual para mostrar el deslizamiento
+        axes[2].barh([f'Split {i+1}'], [len(train)], left=[start_pos], color='blue', alpha=0.6)
+        axes[2].barh([f'Split {i+1}'], [len(val)], left=[start_pos + len(train)], color='orange', alpha=0.6)
+    axes[2].set_title('Estrategia 3: Sliding Cross-Validation', fontsize=12, fontweight='bold')
+    axes[2].set_xlabel('Posición temporal relativa')
+    axes[2].grid(True, alpha=0.3, axis='x')
+    
+    plt.tight_layout()
+    plt.savefig('outputs/cv_strategies_comparison.png', dpi=300, bbox_inches='tight')
+    print("\nGráfica guardada: outputs/cv_strategies_comparison.png")
+    plt.close()
+    
+    print("\n" + "="*80)
+    print("CONCLUSIÓN SOBRE ESTRATEGIAS:")
+    print("="*80)
+    print("- División Fija: Simple, un único split. Usado para entrenamiento final.")
+    print("- Expanding CV: El train crece progresivamente. Útil para datos con tendencias.")
+    print("- Sliding CV: Ventana fija que se desliza. Captura patrones en diferentes períodos.")
+    print("Para este proyecto, usaremos la división fija para el entrenamiento final.")
 
 
 def scale_data(train_df, val_df, test_df):
@@ -453,6 +600,358 @@ def inverse_transform_predictions(predictions, scaler, feature_idx=0):
     predictions_original = np.array(predictions_original).reshape(n_samples, -1)
     
     return predictions_original
+
+
+def hyperparameter_tuning_learning_rate(X_train, y_train, X_val, y_val, timesteps=TIMESTEPS, horizon=HORIZON):
+    """
+    Prueba diferentes learning rates y compara los resultados.
+    
+    Args:
+        X_train, y_train: Datos de entrenamiento
+        X_val, y_val: Datos de validación
+        timesteps, horizon: Parámetros de secuencia
+    
+    Returns:
+        dict: Resultados de cada learning rate
+    """
+    print("\n" + "="*80)
+    print("EXPERIMENTO 1: COMPARACIÓN DE LEARNING RATES")
+    print("="*80)
+    
+    learning_rates = [0.0001, 0.001, 0.01]
+    results = {}
+    histories = {}
+    
+    for lr in learning_rates:
+        print(f"\nEntrenando con Learning Rate = {lr}")
+        
+        # Construir modelo simple para prueba
+        model = Sequential([
+            LSTM(32, activation='relu', return_sequences=True, 
+                 input_shape=(timesteps, 1)),
+            Dropout(0.2),
+            LSTM(16, activation='relu'),
+            Dropout(0.2),
+            Dense(horizon)
+        ])
+        
+        optimizer = Adam(learning_rate=lr)
+        model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
+        
+        # Entrenar
+        history = model.fit(
+            X_train, y_train,
+            validation_data=(X_val, y_val),
+            epochs=50,  # Menos épocas para experimentación
+            batch_size=32,
+            verbose=0
+        )
+        
+        # Guardar resultados
+        results[lr] = {
+            'final_train_loss': history.history['loss'][-1],
+            'final_val_loss': history.history['val_loss'][-1],
+            'final_train_mae': history.history['mae'][-1],
+            'final_val_mae': history.history['val_mae'][-1]
+        }
+        histories[lr] = history
+        
+        print(f"  Train Loss: {results[lr]['final_train_loss']:.6f}")
+        print(f"  Val Loss: {results[lr]['final_val_loss']:.6f}")
+        print(f"  Train MAE: {results[lr]['final_train_mae']:.6f}")
+        print(f"  Val MAE: {results[lr]['final_val_mae']:.6f}")
+    
+    # Visualizar resultados
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    
+    # Plot 1: Evolución de pérdida
+    for lr in learning_rates:
+        axes[0].plot(histories[lr].history['val_loss'], label=f'LR={lr}', linewidth=2)
+    axes[0].set_title('Comparación de Learning Rates - Pérdida de Validación', 
+                      fontsize=12, fontweight='bold')
+    axes[0].set_xlabel('Época')
+    axes[0].set_ylabel('MSE Loss')
+    axes[0].legend()
+    axes[0].grid(True, alpha=0.3)
+    axes[0].set_yscale('log')
+    
+    # Plot 2: Comparación final
+    lrs_labels = [str(lr) for lr in learning_rates]
+    val_losses = [results[lr]['final_val_loss'] for lr in learning_rates]
+    colors = ['red' if loss == min(val_losses) else 'blue' for loss in val_losses]
+    
+    axes[1].bar(lrs_labels, val_losses, color=colors, alpha=0.7)
+    axes[1].set_title('Pérdida Final de Validación por Learning Rate', 
+                      fontsize=12, fontweight='bold')
+    axes[1].set_xlabel('Learning Rate')
+    axes[1].set_ylabel('MSE Loss')
+    axes[1].grid(True, alpha=0.3, axis='y')
+    
+    # Marcar el mejor
+    best_lr = min(results, key=lambda x: results[x]['final_val_loss'])
+    axes[1].text(lrs_labels.index(str(best_lr)), val_losses[lrs_labels.index(str(best_lr))], 
+                 'MEJOR', ha='center', va='bottom', fontweight='bold', fontsize=10)
+    
+    plt.tight_layout()
+    plt.savefig('outputs/hyperparameter_learning_rate.png', dpi=300, bbox_inches='tight')
+    print("\nGráfica guardada: outputs/hyperparameter_learning_rate.png")
+    plt.close()
+    
+    # Determinar el mejor
+    best_lr = min(results, key=lambda x: results[x]['final_val_loss'])
+    print(f"\n✓ MEJOR LEARNING RATE: {best_lr}")
+    print(f"  Val Loss: {results[best_lr]['final_val_loss']:.6f}")
+    
+    return results, best_lr
+
+
+def hyperparameter_tuning_comprehensive(X_train, y_train, X_val, y_val, 
+                                       timesteps=TIMESTEPS, horizon=HORIZON):
+    """
+    Prueba diferentes combinaciones de hiperparámetros:
+    - Épocas: 50, 100, 150
+    - Batch Size: 16, 32, 64
+    - Optimizadores: Adam, RMSprop
+    - Loss functions: MSE, MAE
+    - Regularización L2: 0.0001, 0.001, 0.01
+    
+    Args:
+        X_train, y_train: Datos de entrenamiento
+        X_val, y_val: Datos de validación
+        timesteps, horizon: Parámetros de secuencia
+    
+    Returns:
+        dict: Resultados de experimentos
+    """
+    print("\n" + "="*80)
+    print("EXPERIMENTO 2: PRUEBA EXHAUSTIVA DE HIPERPARÁMETROS")
+    print("="*80)
+    
+    all_results = {}
+    
+    # 1. Épocas
+    print("\n1. COMPARANDO ÉPOCAS (50, 100, 150):")
+    epochs_options = [50, 100, 150]
+    epochs_results = {}
+    
+    for epochs in epochs_options:
+        print(f"   Entrenando con {epochs} épocas...")
+        model = Sequential([
+            LSTM(32, activation='relu', return_sequences=True, 
+                 input_shape=(timesteps, 1)),
+            Dropout(0.2),
+            LSTM(16, activation='relu'),
+            Dense(horizon)
+        ])
+        model.compile(optimizer=Adam(0.001), loss='mse', metrics=['mae'])
+        
+        history = model.fit(X_train, y_train, validation_data=(X_val, y_val),
+                          epochs=epochs, batch_size=32, verbose=0)
+        
+        epochs_results[epochs] = history.history['val_loss'][-1]
+        print(f"   Val Loss: {epochs_results[epochs]:.6f}")
+    
+    best_epochs = min(epochs_results, key=epochs_results.get)
+    print(f"   ✓ MEJOR: {best_epochs} épocas (Val Loss: {epochs_results[best_epochs]:.6f})")
+    
+    # 2. Batch Size
+    print("\n2. COMPARANDO BATCH SIZES (16, 32, 64):")
+    batch_sizes = [16, 32, 64]
+    batch_results = {}
+    
+    for batch_size in batch_sizes:
+        print(f"   Entrenando con batch_size={batch_size}...")
+        model = Sequential([
+            LSTM(32, activation='relu', return_sequences=True, 
+                 input_shape=(timesteps, 1)),
+            Dropout(0.2),
+            LSTM(16, activation='relu'),
+            Dense(horizon)
+        ])
+        model.compile(optimizer=Adam(0.001), loss='mse', metrics=['mae'])
+        
+        history = model.fit(X_train, y_train, validation_data=(X_val, y_val),
+                          epochs=50, batch_size=batch_size, verbose=0)
+        
+        batch_results[batch_size] = history.history['val_loss'][-1]
+        print(f"   Val Loss: {batch_results[batch_size]:.6f}")
+    
+    best_batch = min(batch_results, key=batch_results.get)
+    print(f"   ✓ MEJOR: batch_size={best_batch} (Val Loss: {batch_results[best_batch]:.6f})")
+    
+    # 3. Optimizadores
+    print("\n3. COMPARANDO OPTIMIZADORES (Adam, RMSprop, SGD):")
+    from tensorflow.keras.optimizers import RMSprop, SGD
+    optimizers = {
+        'Adam': Adam(0.001),
+        'RMSprop': RMSprop(0.001),
+        'SGD': SGD(0.001)
+    }
+    opt_results = {}
+    
+    for opt_name, optimizer in optimizers.items():
+        print(f"   Entrenando con {opt_name}...")
+        model = Sequential([
+            LSTM(32, activation='relu', return_sequences=True, 
+                 input_shape=(timesteps, 1)),
+            Dropout(0.2),
+            LSTM(16, activation='relu'),
+            Dense(horizon)
+        ])
+        model.compile(optimizer=optimizer, loss='mse', metrics=['mae'])
+        
+        history = model.fit(X_train, y_train, validation_data=(X_val, y_val),
+                          epochs=50, batch_size=32, verbose=0)
+        
+        opt_results[opt_name] = history.history['val_loss'][-1]
+        print(f"   Val Loss: {opt_results[opt_name]:.6f}")
+    
+    best_opt = min(opt_results, key=opt_results.get)
+    print(f"   ✓ MEJOR: {best_opt} (Val Loss: {opt_results[best_opt]:.6f})")
+    
+    # 4. Loss Functions
+    print("\n4. COMPARANDO FUNCIONES DE PÉRDIDA (MSE, MAE, Huber):")
+    losses = ['mse', 'mae', 'huber']
+    loss_results = {}
+    
+    for loss_fn in losses:
+        print(f"   Entrenando con loss={loss_fn}...")
+        model = Sequential([
+            LSTM(32, activation='relu', return_sequences=True, 
+                 input_shape=(timesteps, 1)),
+            Dropout(0.2),
+            LSTM(16, activation='relu'),
+            Dense(horizon)
+        ])
+        model.compile(optimizer=Adam(0.001), loss=loss_fn, metrics=['mae'])
+        
+        history = model.fit(X_train, y_train, validation_data=(X_val, y_val),
+                          epochs=50, batch_size=32, verbose=0)
+        
+        loss_results[loss_fn] = history.history['val_mae'][-1]  # Usar MAE para comparar
+        print(f"   Val MAE: {loss_results[loss_fn]:.6f}")
+    
+    best_loss = min(loss_results, key=loss_results.get)
+    print(f"   ✓ MEJOR: {best_loss} (Val MAE: {loss_results[best_loss]:.6f})")
+    
+    # 5. Regularización L2
+    print("\n5. COMPARANDO REGULARIZACIÓN L2 (0.0, 0.0001, 0.001, 0.01):")
+    l2_values = [0.0, 0.0001, 0.001, 0.01]
+    l2_results = {}
+    
+    for l2_val in l2_values:
+        print(f"   Entrenando con L2={l2_val}...")
+        model = Sequential([
+            LSTM(32, activation='relu', return_sequences=True, 
+                 input_shape=(timesteps, 1), kernel_regularizer=l2(l2_val) if l2_val > 0 else None),
+            Dropout(0.2),
+            LSTM(16, activation='relu', kernel_regularizer=l2(l2_val) if l2_val > 0 else None),
+            Dense(horizon)
+        ])
+        model.compile(optimizer=Adam(0.001), loss='mse', metrics=['mae'])
+        
+        history = model.fit(X_train, y_train, validation_data=(X_val, y_val),
+                          epochs=50, batch_size=32, verbose=0)
+        
+        l2_results[l2_val] = history.history['val_loss'][-1]
+        print(f"   Val Loss: {l2_results[l2_val]:.6f}")
+    
+    best_l2 = min(l2_results, key=l2_results.get)
+    print(f"   ✓ MEJOR: L2={best_l2} (Val Loss: {l2_results[best_l2]:.6f})")
+    
+    # Visualizar todos los resultados
+    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+    fig.suptitle('Comparación Exhaustiva de Hiperparámetros', fontsize=16, fontweight='bold')
+    
+    # 1. Épocas
+    epochs_labels = [str(e) for e in epochs_options]
+    epochs_vals = list(epochs_results.values())
+    colors1 = ['green' if e == best_epochs else 'blue' for e in epochs_options]
+    axes[0, 0].bar(epochs_labels, epochs_vals, color=colors1, alpha=0.7)
+    axes[0, 0].set_title('Épocas')
+    axes[0, 0].set_ylabel('Val Loss')
+    axes[0, 0].grid(True, alpha=0.3, axis='y')
+    
+    # 2. Batch Size
+    batch_labels = [str(b) for b in batch_sizes]
+    batch_vals = list(batch_results.values())
+    colors2 = ['green' if b == best_batch else 'blue' for b in batch_sizes]
+    axes[0, 1].bar(batch_labels, batch_vals, color=colors2, alpha=0.7)
+    axes[0, 1].set_title('Batch Size')
+    axes[0, 1].set_ylabel('Val Loss')
+    axes[0, 1].grid(True, alpha=0.3, axis='y')
+    
+    # 3. Optimizadores
+    opt_labels = list(opt_results.keys())
+    opt_vals = list(opt_results.values())
+    colors3 = ['green' if opt == best_opt else 'blue' for opt in opt_labels]
+    axes[0, 2].bar(opt_labels, opt_vals, color=colors3, alpha=0.7)
+    axes[0, 2].set_title('Optimizadores')
+    axes[0, 2].set_ylabel('Val Loss')
+    axes[0, 2].grid(True, alpha=0.3, axis='y')
+    axes[0, 2].tick_params(axis='x', rotation=45)
+    
+    # 4. Loss Functions
+    loss_labels = losses
+    loss_vals = list(loss_results.values())
+    colors4 = ['green' if l == best_loss else 'blue' for l in losses]
+    axes[1, 0].bar(loss_labels, loss_vals, color=colors4, alpha=0.7)
+    axes[1, 0].set_title('Función de Pérdida')
+    axes[1, 0].set_ylabel('Val MAE')
+    axes[1, 0].grid(True, alpha=0.3, axis='y')
+    
+    # 5. Regularización L2
+    l2_labels = [str(l) for l in l2_values]
+    l2_vals = list(l2_results.values())
+    colors5 = ['green' if l == best_l2 else 'blue' for l in l2_values]
+    axes[1, 1].bar(l2_labels, l2_vals, color=colors5, alpha=0.7)
+    axes[1, 1].set_title('Regularización L2')
+    axes[1, 1].set_ylabel('Val Loss')
+    axes[1, 1].grid(True, alpha=0.3, axis='y')
+    axes[1, 1].tick_params(axis='x', rotation=45)
+    
+    # 6. Resumen
+    axes[1, 2].axis('off')
+    summary_text = f"""
+    MEJORES HIPERPARÁMETROS:
+    
+    Épocas: {best_epochs}
+    Batch Size: {best_batch}
+    Optimizador: {best_opt}
+    Loss Function: {best_loss}
+    Regularización L2: {best_l2}
+    
+    Estos valores se usarán
+    para el entrenamiento final.
+    """
+    axes[1, 2].text(0.1, 0.5, summary_text, fontsize=11, 
+                    verticalalignment='center', family='monospace',
+                    bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+    
+    plt.tight_layout()
+    plt.savefig('outputs/hyperparameter_comprehensive.png', dpi=300, bbox_inches='tight')
+    print("\nGráfica guardada: outputs/hyperparameter_comprehensive.png")
+    plt.close()
+    
+    # Guardar resultados
+    all_results = {
+        'epochs': {'results': epochs_results, 'best': best_epochs},
+        'batch_size': {'results': batch_results, 'best': best_batch},
+        'optimizer': {'results': opt_results, 'best': best_opt},
+        'loss': {'results': loss_results, 'best': best_loss},
+        'l2': {'results': l2_results, 'best': best_l2}
+    }
+    
+    print("\n" + "="*80)
+    print("RESUMEN DE HIPERPARÁMETROS ÓPTIMOS:")
+    print("="*80)
+    print(f"Épocas: {best_epochs}")
+    print(f"Batch Size: {best_batch}")
+    print(f"Optimizador: {best_opt}")
+    print(f"Loss Function: {best_loss}")
+    print(f"Regularización L2: {best_l2}")
+    
+    return all_results
 
 
 def train_baseline_model(X_train, y_train, X_val, y_val):
@@ -752,20 +1251,23 @@ def main():
     # 2. Crear dataset filtrado
     df = create_filtered_dataset(data)
     
-    # 3. Análisis exploratorio
-    exploratory_data_analysis(df)
-    
-    # 4. Feature engineering
+    # 3. Feature engineering (ANTES de EDA, para incluir variables en el análisis)
     df = feature_engineering(df)
     
-    # 5. División temporal
+    # 4. Análisis exploratorio (ahora incluye Daily_Return y Volatility)
+    exploratory_data_analysis(df)
+    
+    # 5. Comparación de estrategias de validación cruzada
+    compare_cv_strategies(df)
+    
+    # 6. División temporal (usamos la división fija original para entrenamiento)
     train_df, val_df, test_df = temporal_split(df)
     
-    # 6. Escalado
+    # 7. Escalado
     train_scaled, val_scaled, test_scaled, scaler_train, scaler_val, scaler_test = \
         scale_data(train_df, val_df, test_df)
     
-    # 7. Crear secuencias para modelos univariados
+    # 8. Crear secuencias para modelos univariados
     print("\n" + "="*80)
     print("GENERACIÓN DE SECUENCIAS")
     print("="*80)
@@ -779,7 +1281,7 @@ def main():
     print(f"  Val:   X={X_val_univ.shape}, y={y_val_univ.shape}")
     print(f"  Test:  X={X_test_univ.shape}, y={y_test_univ.shape}")
     
-    # 8. Crear secuencias para modelos multivariados
+    # 9. Crear secuencias para modelos multivariados
     X_train_mult, y_train_mult = create_sequences_multivariate(train_scaled)
     X_val_mult, y_val_mult = create_sequences_multivariate(val_scaled)
     X_test_mult, y_test_mult = create_sequences_multivariate(test_scaled)
@@ -789,31 +1291,49 @@ def main():
     print(f"  Val:   X={X_val_mult.shape}, y={y_val_mult.shape}")
     print(f"  Test:  X={X_test_mult.shape}, y={y_test_mult.shape}")
     
-    # 9. Entrenar Baseline
+    # 10. EXPERIMENTACIÓN CON HIPERPARÁMETROS
+    print("\n" + "="*80)
+    print("SECCIÓN DE EXPERIMENTACIÓN DE HIPERPARÁMETROS")
+    print("="*80)
+    
+    # Experimento 1: Learning Rates
+    lr_results, best_lr = hyperparameter_tuning_learning_rate(
+        X_train_univ, y_train_univ, X_val_univ, y_val_univ
+    )
+    
+    # Experimento 2: Otros hiperparámetros
+    hp_results = hyperparameter_tuning_comprehensive(
+        X_train_univ, y_train_univ, X_val_univ, y_val_univ
+    )
+    
+    # 11. Entrenar Baseline
+    print("\n" + "="*80)
+    print("ENTRENAMIENTO DE MODELOS CON HIPERPARÁMETROS ÓPTIMOS")
+    print("="*80)
     baseline_model = train_baseline_model(X_train_univ, y_train_univ, 
                                          X_val_univ, y_val_univ)
     
-    # 10. Entrenar LSTM Univariado
-    lstm_univ_model = build_lstm_univariate()
+    # 12. Entrenar LSTM Univariado (con mejor learning rate)
+    lstm_univ_model = build_lstm_univariate(learning_rate=best_lr)
     lstm_univ_model, lstm_univ_history = train_deep_learning_model(
         lstm_univ_model, X_train_univ, y_train_univ, 
-        X_val_univ, y_val_univ, 'LSTM Univariado'
+        X_val_univ, y_val_univ, 'LSTM Univariado', epochs=hp_results['epochs']['best']
     )
     plot_training_history(lstm_univ_history, 'LSTM Univariado')
     
-    # 11. Entrenar CNN Univariado
-    cnn_univ_model = build_cnn_univariate()
+    # 13. Entrenar CNN Univariado
+    cnn_univ_model = build_cnn_univariate(learning_rate=best_lr)
     cnn_univ_model, cnn_univ_history = train_deep_learning_model(
         cnn_univ_model, X_train_univ, y_train_univ, 
-        X_val_univ, y_val_univ, 'CNN Univariado'
+        X_val_univ, y_val_univ, 'CNN Univariado', epochs=hp_results['epochs']['best']
     )
     plot_training_history(cnn_univ_history, 'CNN Univariado')
     
-    # 12. Entrenar LSTM Multivariado
-    lstm_mult_model = build_lstm_multivariate()
+    # 14. Entrenar LSTM Multivariado
+    lstm_mult_model = build_lstm_multivariate(learning_rate=best_lr)
     lstm_mult_model, lstm_mult_history = train_deep_learning_model(
         lstm_mult_model, X_train_mult, y_train_mult, 
-        X_val_mult, y_val_mult, 'LSTM Multivariado'
+        X_val_mult, y_val_mult, 'LSTM Multivariado', epochs=hp_results['epochs']['best']
     )
     plot_training_history(lstm_mult_history, 'LSTM Multivariado')
     
