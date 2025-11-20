@@ -130,7 +130,7 @@ def download_data(symbol=SYMBOL, start=START_DATE, end=END_DATE):
     })
     
     print(f"Datos sintéticos generados: {len(data)} registros")
-    print("Rango de precios: ${:.2f} - ${:.2f}".format(data['Close'].min(), data['Close'].max()))
+    print(f"Rango de precios: ${data['Close'].min():.2f} - ${data['Close'].max():.2f}")
     
     return data
 
