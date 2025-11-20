@@ -80,7 +80,6 @@ print(f"Python: {sys.version.split()[0]}")
 print(f"Pandas: {pd.__version__}")
 print(f"NumPy: {np.__version__}")
 print(f"TensorFlow: {tf.__version__}")
-print(f"Scikit-learn: {sklearn.__version__}")
 print("=" * 80)
 
 print("\n✅ SECCIÓN 1 COMPLETADA")
