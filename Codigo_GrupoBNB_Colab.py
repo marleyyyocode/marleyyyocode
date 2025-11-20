@@ -209,19 +209,15 @@ def exploratory_data_analysis(df):
     for feature in features_to_analyze:
         if feature in df.columns:
             print(f"\nEstadísticas descriptivas para {feature}:")
-            print(df[feature].describe())
-            
-            feature_mean = df[feature].mean()
-            feature_median = df[feature].median()
-            feature_std = df[feature].std()
-            feature_min = df[feature].min()
-            feature_max = df[feature].max()
-            
-            print(f"Media: {feature_mean:.6f}")
-            print(f"Mediana: {feature_median:.6f}")
-            print(f"Desviación estándar: {feature_std:.6f}")
-            print(f"Mínimo: {feature_min:.6f}")
-            print(f"Máximo: {feature_max:.6f}")
+            stats = df[feature].describe()
+            print(f"  count: {stats['count']:.0f}")
+            print(f"  mean:  {stats['mean']:.6f}")
+            print(f"  std:   {stats['std']:.6f}")
+            print(f"  min:   {stats['min']:.6f}")
+            print(f"  25%:   {stats['25%']:.6f}")
+            print(f"  50%:   {stats['50%']:.6f}")
+            print(f"  75%:   {stats['75%']:.6f}")
+            print(f"  max:   {stats['max']:.6f}")
     
     # Gráficas de series temporales (ahora incluye 5 variables)
     fig, axes = plt.subplots(5, 1, figsize=(14, 16))
