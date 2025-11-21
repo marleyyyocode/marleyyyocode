@@ -25,13 +25,13 @@ train_end = pd.Timestamp('2023-11-30')
 val_end = pd.Timestamp('2024-02-28')
 
 # División
-df_train = df[df[('Date', '')] <= train_end].copy()
-df_val = df[(df[('Date', '')] > train_end) & (df[('Date', '')] <= val_end)].copy()
-df_test = df[df[('Date', '')] > val_end].copy()
+df_train = df_filtered[df_filtered['Date'] <= train_end].copy()
+df_val = df_filtered[(df_filtered['Date'] > train_end) & (df_filtered['Date'] <= val_end)].copy()
+df_test = df_filtered[df_filtered['Date'] > val_end].copy()
 
-print(f"✅ Train: {len(df_train)} registros ({df_train[('Date', '')].min()} a {df_train[('Date', '')].max()})")
-print(f"✅ Val:   {len(df_val)} registros ({df_val[('Date', '')].min()} a {df_val[('Date', '')].max()})")
-print(f"✅ Test:  {len(df_test)} registros ({df_test[('Date', '')].min()} a {df_test[('Date', '')].max()})")
+print(f"✅ Train: {len(df_train)} registros ({df_train['Date'].min()} a {df_train['Date'].max()})")
+print(f"✅ Val:   {len(df_val)} registros ({df_val['Date'].min()} a {df_val['Date'].max()})")
+print(f"✅ Test:  {len(df_test)} registros ({df_test['Date'].min()} a {df_test['Date'].max()})")
 
 # ============================================================================
 # 2. ESCALADO DE DATOS
@@ -41,8 +41,7 @@ print("\n[2/4] Escalado de datos con MinMaxScaler...")
 from sklearn.preprocessing import MinMaxScaler
 
 # Columnas a escalar
-features_scale = [('Close', 'BNB-USD'), ('High', 'BNB-USD'), ('Volume', 'BNB-USD'), 
-                  ('Daily_Return', ''), ('Volatility', '')]
+features_scale = ['Close', 'High', 'Volume', 'Daily_Return', 'Volatility']
 
 # Crear escaladores
 scaler_train = MinMaxScaler()
@@ -75,7 +74,7 @@ HORIZON = 5
 def create_sequences_univariate(data, timesteps, horizon):
     """Crea secuencias para modelos univariados (solo Close)"""
     X, y = [], []
-    close_col = ('Close', 'BNB-USD')
+    close_col = 'Close'
     
     for i in range(len(data) - timesteps - horizon + 1):
         # X: últimos 'timesteps' valores
@@ -110,9 +109,9 @@ def create_sequences_multivariate(data, timesteps, horizon):
     X, y = [], []
     
     # Features de entrada: High, Volume, Volatility
-    input_features = [('High', 'BNB-USD'), ('Volume', 'BNB-USD'), ('Volatility', '')]
+    input_features = ['High', 'Volume', 'Volatility']
     # Target: Close
-    target_feature = ('Close', 'BNB-USD')
+    target_feature = 'Close'
     
     for i in range(len(data) - timesteps - horizon + 1):
         # X: últimos 'timesteps' valores de las 3 features
