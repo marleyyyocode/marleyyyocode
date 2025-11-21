@@ -57,13 +57,13 @@ print("\n[2/3] Generando gráfica comparativa...")
 plt.figure(figsize=(15, 8))
 
 # Graficar valores reales
-plt.plot(y_test_univ, label='Valores Reales', color='blue', linewidth=2, alpha=0.8)
+plt.plot(y_test_real[:, 0], label='Valores Reales', color='blue', linewidth=2, alpha=0.8)
 
-# Graficar predicciones de cada modelo
-plt.plot(y_pred_baseline_original, label='Baseline', color='gray', linestyle='--', linewidth=1.5, alpha=0.7)
-plt.plot(y_pred_lstm_univ_original, label='LSTM Univariado', color='green', linestyle='-', linewidth=1.5, alpha=0.7)
-plt.plot(y_pred_cnn_univ_original, label='CNN Univariado', color='red', linestyle='-', linewidth=1.5, alpha=0.7)
-plt.plot(y_pred_lstm_multi_original, label='LSTM Multivariado', color='purple', linestyle='-', linewidth=1.5, alpha=0.7)
+# Graficar predicciones de cada modelo (usando variables _real de secciones 7-10)
+plt.plot(y_pred_real[:, 0], label='Baseline', color='gray', linestyle='--', linewidth=1.5, alpha=0.7)
+plt.plot(y_pred_lstm_real[:, 0], label='LSTM Univariado', color='green', linestyle='-', linewidth=1.5, alpha=0.7)
+plt.plot(y_pred_cnn_real[:, 0], label='CNN Univariado', color='red', linestyle='-', linewidth=1.5, alpha=0.7)
+plt.plot(y_pred_lstm_multi_real[:, 0], label='LSTM Multivariado', color='purple', linestyle='-', linewidth=1.5, alpha=0.7)
 
 # Configurar gráfica
 plt.title('Comparación de Todos los Modelos - Test Set', fontsize=16, fontweight='bold')
