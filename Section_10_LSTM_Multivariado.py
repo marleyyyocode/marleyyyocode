@@ -68,7 +68,8 @@ y_pred_lstm_multi_avg = y_pred_lstm_multi.mean(axis=1)
 y_test_lstm_multi_avg = y_test_multi.mean(axis=1)
 
 # Des-escalar
-close_idx = df_test_scaled.columns.get_loc(('Close', 'BNB-USD'))
+# Close es la primera columna (índice 0) en la lista de features_scale
+close_idx = 0  # 'Close' es la primera columna
 
 y_test_lstm_multi_real = scaler_test.inverse_transform(
     np.concatenate([y_test_lstm_multi_avg.reshape(-1, 1)] + 

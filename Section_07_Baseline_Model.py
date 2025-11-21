@@ -52,7 +52,8 @@ print("\n[3/3] Evaluando en test set...")
 y_pred_baseline = baseline_model.predict(X_test_baseline)
 
 # Des-escalar predicciones y valores reales
-close_idx = df_test_scaled.columns.get_loc(('Close', 'BNB-USD'))
+# Close es la primera columna (índice 0) en la lista de features_scale
+close_idx = 0  # 'Close' es la primera columna
 
 y_test_real = scaler_test.inverse_transform(
     np.concatenate([y_test_baseline.reshape(-1, 1)] + 
