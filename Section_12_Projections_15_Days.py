@@ -35,7 +35,7 @@ def project_future(model, initial_sequence, scaler, n_days, model_type='baseline
     Args:
         model: Modelo entrenado
         initial_sequence: Secuencia inicial (últimos 30 días del test set)
-        scaler: Scaler usado para entrenar el modelo
+        scaler: Scaler usado para entrenar el modelo (fit on 5 features)
         n_days: Número de días a proyectar
         model_type: 'baseline', 'lstm_univ', 'cnn_univ', 'lstm_multi'
     
@@ -61,12 +61,18 @@ def project_future(model, initial_sequence, scaler, n_days, model_type='baseline
             current_multi[0, :, 2] = 1000000  # Volume dummy
             pred_scaled = model.predict(current_multi, verbose=0)[0, 0]
         
-        # Invertir escala
-        pred_original = scaler.inverse_transform([[pred_scaled]])[0, 0]
+        # Invertir escala: scaler tiene 5 features [Close, High, Volume, Daily_Return, Volatility]
+        # Close está en índice 0
+        dummy_row = np.zeros((1, 5))  # Crear fila con 5 features
+        dummy_row[0, 0] = pred_scaled  # Poner predicción en Close (índice 0)
+        pred_original = scaler.inverse_transform(dummy_row)[0, 0]  # Extraer Close
         projections.append(pred_original)
         
         # Actualizar secuencia (agregar predicción y quitar valor más antiguo)
-        new_val_scaled = scaler.transform([[pred_original]])[0, 0]
+        # Escalar la predicción para usarla en próxima iteración
+        dummy_row_forward = np.zeros((1, 5))
+        dummy_row_forward[0, 0] = pred_original
+        new_val_scaled = scaler.transform(dummy_row_forward)[0, 0]
         current_sequence = np.append(current_sequence[1:], new_val_scaled)
     
     return np.array(projections)
