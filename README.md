@@ -30,6 +30,7 @@ Here are some ideas to get you started:
 - Health insurance access evaluation (PSM)
 - Mortgage approval prediction (Machine Learning)
 - Nutrition program impact (Policy evaluation)
+- [Audio to Text with OpenAI Whisper](whisper_audio_to_text.ipynb) — Transcribe English & Spanish audio using Whisper in Google Colab [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/marleyyyocode/marleyyyocode/blob/main/whisper_audio_to_text.ipynb)
 
 ### 📫 Connect
 [LinkedIn](your-url) • [Email](mailto:your-email)
