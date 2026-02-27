@@ -36,3 +36,25 @@ Here are some ideas to get you started:
 [LinkedIn](your-url) • [Email](mailto:your-email)
 
 > *Transforming economic data into actionable insights*
+
+---
+
+### 💡 GitHub Tips
+
+#### How to Reopen a Closed (Deleted) Branch
+
+If you deleted a branch after closing/merging a pull request, you can restore it directly on GitHub:
+
+1. Go to the **Pull Requests** tab of the repository.
+2. Click on **Closed** to see closed pull requests.
+3. Open the pull request that was on the deleted branch.
+4. Scroll to the bottom and click **Restore branch**.
+
+Alternatively, if you know the branch's last commit SHA, you can recreate it via the command line:
+
+```bash
+git checkout -b <branch-name> <last-commit-sha>
+git push origin <branch-name>
+```
+
+> **Note:** GitHub keeps deleted branch data for a period of time, so restoration is usually possible soon after deletion.
