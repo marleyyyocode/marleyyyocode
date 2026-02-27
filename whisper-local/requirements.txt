@@ -1,0 +1,6 @@
+openai-whisper
+sounddevice
+soundfile
+numpy
+# PyTorch CPU-only — remove "+cpu" suffix if you have a CUDA GPU
+torch
