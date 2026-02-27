@@ -1,11 +1,6 @@
 @echo off
-cd /d "%~dp0"
+call C:\Users\twder\anaconda3\Scripts\activate.bat
 call conda activate whisper-gui-env
-if errorlevel 1 (
-    echo ERROR: Could not activate whisper-gui-env.
-    echo Please run setup_env.bat first.
-    pause
-    exit /b 1
-)
+cd /d "%~dp0"
 python app.py
 pause
