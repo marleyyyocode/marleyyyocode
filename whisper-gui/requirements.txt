@@ -1,0 +1,5 @@
+openai-whisper
+sounddevice
+soundfile
+numpy
+# torch is installed as a dependency of openai-whisper (CPU version is fine)
